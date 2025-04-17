@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, FileText, Award, Edit, Trash2, BookOpen, MapPin, Building, Users, Certificate } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, Award, Edit, Trash2, BookOpen, MapPin, Building, Users, Medal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -250,7 +250,7 @@ const RecordDetails = () => {
 
                   {record.details.certificate && (
                     <div className="flex items-center gap-2">
-                      <Certificate className="h-5 w-5 text-amber-500" />
+                      <Medal className="h-5 w-5 text-amber-500" />
                       <span className="font-medium">Certified Achievement</span>
                     </div>
                   )}
