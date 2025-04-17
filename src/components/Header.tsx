@@ -1,14 +1,38 @@
-
-import { Search, Plus, Menu, Bell } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Plus, Menu, Bell, Command } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Get current path to determine which section to search in
+      const path = window.location.pathname;
+      
+      // Keep the user on the same page but with the search query applied
+      if (path.includes('documents')) {
+        navigate('/documents', { state: { searchTerm: searchQuery } });
+      } else if (path.includes('semesters')) {
+        navigate('/semesters', { state: { searchTerm: searchQuery } });
+      } else if (path.includes('achievements')) {
+        navigate('/achievements', { state: { searchTerm: searchQuery } });
+      } else {
+        // Default to documents if not on a specific page
+        navigate('/documents', { state: { searchTerm: searchQuery } });
+      }
+    }
+  };
+
   return (
     <header className="bg-white border-b border-border px-4 py-3 flex items-center justify-between shadow-sm">
       <div className="flex items-center lg:hidden">
@@ -18,14 +42,21 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       </div>
       
       <div className="flex flex-1 items-center max-w-md mx-4">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search records..."
-            className="w-full pl-9 rounded-md bg-background"
-          />
-        </div>
+        <form onSubmit={handleSearch} className="w-full relative">
+          <div className="relative w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search records..."
+              className="w-full pl-9 pr-12 rounded-md bg-background"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <kbd className="pointer-events-none absolute right-2 top-2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </div>
+        </form>
       </div>
       
       <div className="flex items-center gap-2">

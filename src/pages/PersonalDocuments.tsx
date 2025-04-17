@@ -1,5 +1,6 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FileText, Filter, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,10 +8,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RecordCard from '@/components/RecordCard';
 
+interface LocationState {
+  searchTerm?: string;
+}
+
 const PersonalDocuments = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+  
+  const [searchTerm, setSearchTerm] = useState(locationState?.searchTerm || '');
   const [sortBy, setSortBy] = useState('latest');
   const [activeTab, setActiveTab] = useState('all');
+
+  // Update search term when it comes from location state
+  useEffect(() => {
+    if (locationState?.searchTerm) {
+      setSearchTerm(locationState.searchTerm);
+    }
+  }, [locationState?.searchTerm]);
 
   // Sample data - in a real app, this would come from your API
   const documents = [
