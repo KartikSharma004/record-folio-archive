@@ -1,9 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, Menu, Bell, Command } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useNavigate } from 'react-router-dom';
+import { 
+  CommandDialog, 
+  CommandInput, 
+  CommandList, 
+  CommandGroup, 
+  CommandItem, 
+  CommandEmpty 
+} from '@/components/ui/command';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -11,15 +19,26 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Get current path to determine which section to search in
       const path = window.location.pathname;
       
-      // Keep the user on the same page but with the search query applied
       if (path.includes('documents')) {
         navigate('/documents', { state: { searchTerm: searchQuery } });
       } else if (path.includes('semesters')) {
@@ -27,9 +46,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       } else if (path.includes('achievements')) {
         navigate('/achievements', { state: { searchTerm: searchQuery } });
       } else {
-        // Default to documents if not on a specific page
         navigate('/documents', { state: { searchTerm: searchQuery } });
       }
+      
+      setOpen(false);
+    }
+  };
+
+  const navigateToSearch = (path: string) => {
+    if (searchQuery.trim()) {
+      navigate(path, { state: { searchTerm: searchQuery } });
+      setOpen(false);
     }
   };
 
@@ -42,21 +69,19 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       </div>
       
       <div className="flex flex-1 items-center max-w-md mx-4">
-        <form onSubmit={handleSearch} className="w-full relative">
-          <div className="relative w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search records..."
-              className="w-full pl-9 pr-12 rounded-md bg-background"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="relative w-full">
+          <Button
+            variant="outline"
+            className="relative w-full justify-start text-sm text-muted-foreground"
+            onClick={() => setOpen(true)}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            <span>Search records...</span>
             <kbd className="pointer-events-none absolute right-2 top-2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
               <span className="text-xs">⌘</span>K
             </kbd>
-          </div>
-        </form>
+          </Button>
+        </div>
       </div>
       
       <div className="flex items-center gap-2">
@@ -77,6 +102,40 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <Plus className="h-4 w-4 mr-1" /> Add Record
         </Button>
       </div>
+
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput 
+          placeholder="Search records..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Suggestions">
+            <CommandItem 
+              onSelect={() => navigateToSearch('/documents')}
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              <span>Search documents</span>
+            </CommandItem>
+            <CommandItem 
+              onSelect={() => navigateToSearch('/semesters')}
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              <span>Search semesters</span>
+            </CommandItem>
+            <CommandItem 
+              onSelect={() => navigateToSearch('/achievements')}
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              <span>Search achievements</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </header>
   );
 };
