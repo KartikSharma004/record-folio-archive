@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Search, Plus, Menu, Bell, Command } from 'lucide-react';
+import { Search, Plus, Menu, Bell, Command, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -60,6 +61,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
   return (
     <header className="bg-white border-b border-border px-4 py-3 flex items-center justify-between shadow-sm">
       <div className="flex items-center lg:hidden">
@@ -100,6 +105,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         
         <Button variant="default" size="sm" className="hidden sm:flex">
           <Plus className="h-4 w-4 mr-1" /> Add Record
+        </Button>
+
+        <Button variant="outline" size="sm" onClick={handleLoginClick}>
+          <LogIn className="h-4 w-4 mr-1" /> Sign In
         </Button>
       </div>
 

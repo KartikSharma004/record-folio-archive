@@ -10,6 +10,7 @@ import Achievements from "./pages/Achievements";
 import RecordDetails from "./pages/RecordDetails";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="semesters" element={<SemesterRecords />} />
